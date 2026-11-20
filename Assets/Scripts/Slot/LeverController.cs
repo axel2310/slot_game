@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Controls the visual lever pull animation triggered by Bet Buttons.
-/// Direct mouse click is disabled.
+/// Plays mechanical lever pull SFX.
 /// </summary>
 public class LeverController : MonoBehaviour
 {
@@ -42,6 +42,12 @@ public class LeverController : MonoBehaviour
     private IEnumerator PullRoutine(Action onPulled)
     {
         isPulling = true;
+
+        // Play SFX
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayLeverPull();
+        }
 
         // 1. Lever Down
         if (leverUpImage != null) leverUpImage.enabled = false;

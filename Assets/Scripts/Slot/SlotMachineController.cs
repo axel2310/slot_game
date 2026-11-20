@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// Master controller for the slot machine.
-/// Pure button-driven spin lifecycle and payout evaluation.
+/// Pure button-driven spin lifecycle, sequential stopping, audio sync, and payout evaluation.
 /// </summary>
 public class SlotMachineController : MonoBehaviour
 {
@@ -51,26 +51,47 @@ public class SlotMachineController : MonoBehaviour
         // 1. Get RNG outcome
         SymbolType[] outcomes = RNGManager.Instance.GenerateSpinOutcome();
 
-        // 2. Start spinning
+        // 2. Start spinning & audio
         reel1.StartSpin();
         reel2.StartSpin();
         reel3.StartSpin();
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.StartReelSpin();
+        }
 
         yield return new WaitForSeconds(reel1SpinDuration);
 
         // 3. Stop Reel 1
         bool r1Done = false;
-        reel1.StopSpin(outcomes[0], () => r1Done = true);
+        reel1.StopSpin(outcomes[0], () => 
+        {
+            r1Done = true;
+            if (SoundManager.Instance != null) SoundManager.Instance.PlayReelStop();
+        });
         yield return new WaitForSeconds(reel2Delay);
 
         // 4. Stop Reel 2
         bool r2Done = false;
-        reel2.StopSpin(outcomes[1], () => r2Done = true);
+        reel2.StopSpin(outcomes[1], () => 
+        {
+            r2Done = true;
+            if (SoundManager.Instance != null) SoundManager.Instance.PlayReelStop();
+        });
         yield return new WaitForSeconds(reel3Delay);
 
         // 5. Stop Reel 3
         bool r3Done = false;
-        reel3.StopSpin(outcomes[2], () => r3Done = true);
+        reel3.StopSpin(outcomes[2], () => 
+        {
+            r3Done = true;
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlayReelStop();
+                SoundManager.Instance.StopReelSpin();
+            }
+        });
 
         yield return new WaitUntil(() => r1Done && r2Done && r3Done);
 

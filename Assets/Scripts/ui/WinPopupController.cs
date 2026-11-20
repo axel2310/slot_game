@@ -3,7 +3,7 @@ using TMPro;
 
 /// <summary>
 /// Controls the Win Celebration popup using popup.png and Yes_No_Btn.
-/// Handles Play Again (YES) and Collect (NO) actions.
+/// Plays retro win/jackpot audio and handles Play Again (YES) and Collect (NO) actions.
 /// </summary>
 public class WinPopupController : MonoBehaviour
 {
@@ -42,36 +42,34 @@ public class WinPopupController : MonoBehaviour
     {
         if (popupPanel == null) return;
 
+        bool isJackpot = (symbol == SymbolType.Seven);
         string title = "BIG WIN!";
-        if (symbol == SymbolType.Seven) title = "JACKPOT!";
+        if (isJackpot) title = "JACKPOT!";
         else if (symbol == SymbolType.Bar) title = "MEGA WIN!";
 
         if (winTitleText != null) winTitleText.text = title;
         if (winAmountText != null) winAmountText.text = $"+{winAmount}G";
 
+        // Play Win Audio
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayWin(isJackpot);
+        }
+
         popupPanel.SetActive(true);
     }
 
-    /// <summary>
-    /// YES Button: Closes popup and spins again!
-    /// </summary>
-        /// <summary>
-    /// YES Button: Closes popup and spins again with the same bet amount!
-    /// </summary>
     public void OnYesPlayAgain()
     {
         ClosePopup();
 
-        // Same bet amount ke sath dobara spin karega!
+        // Spin again with same bet
         if (BetManager.Instance != null)
         {
             BetManager.Instance.SpinWithCurrentBet();
         }
     }
 
-    /// <summary>
-    /// NO Button: Just closes popup and stays on screen.
-    /// </summary>
     public void OnNoCollect()
     {
         ClosePopup();
