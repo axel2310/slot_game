@@ -1,105 +1,86 @@
-# 🎰 Unity Slot Machine Game Assignment
+# Slot Game Assignment - Unity
 
-A fully functional, modular 2D Classic 3-Reel Slot Machine game built with **Unity (2022.3 LTS / Unity 6)** following industry-standard design patterns, clean OOP principles, and authentic mechanical game feel.
+A 2D 3-Reel Slot Machine game built in Unity for the assignment test.
 
 ---
 
 ## 🎮 Game Overview
-
-The game simulates a retro 16-bit arcade/casino slot machine featuring:
-- **3 Dynamic Spinning Reels** with vertical endless symbol wrapping.
-- **Natural Physics & Easing**: Progressive acceleration, sequential reel stops (**Reel 1 → Reel 2 → Reel 3**), and mechanical **bounce/snap-back overshoot** on landing.
-- **RNG-Driven Outcomes**: Mathematical separation between outcome generation and visual presentation.
-- **Dynamic Wallet Economy**: Balance deductions, real-time balance tracking, and configurable multiplier payouts.
-- **Right-Click Context Menu**: Toggleable betting menu supporting **Bet 10G**, **Bet 50G**, and **Bet 100G**.
-- **Interactive Mechanical Lever**: Dual-state lever animation that triggers spin sequences.
-- **Win Celebration Modal**: Grand popup dialog showcasing winning payouts with **YES (Replay with same bet)** and **NO (Collect & Return)** options.
+The game implements a classic 3-reel slot machine featuring smooth spinning reels, sequential stopping (Reel 1 -> Reel 2 -> Reel 3), and physical bounce-back easing on landing. It includes a wallet economy with dynamic betting, RNG-based outcome calculation, right-click context menu, and a win celebration popup.
 
 ---
 
-## 🏆 Winning Combinations & Payout Table
-
-| Symbol | Combination | Multiplier | Example Payout (Bet = 50G) |
-| :---: | :---: | :---: | :---: |
-| 7️⃣ **Lucky Seven** | 3x Match | **100x (JACKPOT)** | **5,000G** |
-| 🍫 **Triple BAR** | 3x Match | **50x (Mega Win)** | **2,500G** |
-| 🔔 **Bell** | 3x Match | **25x (Big Win)** | **1,250G** |
-| 🍒 **Cherries** | 3x Match | **10x (Standard Win)** | **500G** |
-| 🍒 **Cherries** | 2x Match | **2x (Consolation Return)** | **100G** |
-
----
-
-## 🕹️ Controls & How to Play
-
-- **Right Click**: Open / Close the Bet Selection Context Menu.
-- **Click Bet 10G / 50G / 100G**: Sets the wager, closes the menu, pulls the mechanical lever, and begins the spin sequence.
-- **Click Lever**: Pulls the machine lever and spins with the current active bet.
-- **Win Dialog Buttons**:
-  - **YES**: Replay immediately with the exact same wager.
-  - **NO**: Collect winnings and dismiss modal.
+## ✨ Features
+- **Smooth Reel Animations**: Acceleration, seamless vertical looping of symbols, and bounce easing upon stop.
+- **Sequential Stopping**: Reel 1 stops first, followed by Reel 2 and Reel 3 with suspense delays.
+- **Fair RNG System**: Outcomes are pre-calculated using weighted random distribution, and reels smoothly stop on the target symbols.
+- **Betting & Wallet System**: Starting balance of 500G with selectable bets of 10G, 50G, and 100G.
+- **Right-Click Bet Menu**: Right-click anywhere on the screen to toggle the betting menu open/closed (matches original reference GIF).
+- **Interactive Lever Animation**: Pulls down into the socket and springs back up when placing a bet.
+- **Win Celebration Popup (Bonus Feature)**: Winning combinations trigger a modal using `popup.png` and custom-sliced `Yes_No_Btn.png`:
+  - **YES**: Spin again immediately with the same bet amount.
+  - **NO**: Collect winnings and dismiss popup.
+- **16-Bit Retro Audio (Bonus Feature)**: Custom sound effects for lever pull, continuous reel spin ticking, mechanical reel stops, and celebratory win jingles.
 
 ---
 
-## 🧠 Architecture & Technical Thought Process
+## 🏆 Payout Table
 
-The project is structured according to **SOLID principles** and separation of concerns:
+| Symbol | Combination | Multiplier | Example (Bet = 10G) | Example (Bet = 50G) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Lucky Seven (7)** | 3x Match | **100x (Jackpot)** | 1000G | 5000G |
+| **Triple BAR** | 3x Match | **50x (Mega Win)** | 500G | 2500G |
+| **Bell** | 3x Match | **25x (Big Win)** | 250G | 1250G |
+| **Cherries** | 3x Match | **10x (Standard Win)** | 100G | 500G |
+| **Cherries** | 2x Match | **2x (Bonus Return)** | 20G | 100G |
 
+---
+
+## 🕹️ Controls
+- **Right-Click**: Open / Close the Bet Selection Menu.
+- **Bet 10G / 50G / 100G**: Sets wager, closes menu, pulls lever, and spins reels.
+- **Win Modal Buttons**:
+  - `YES`: Re-spins immediately with the same bet.
+  - `NO`: Closes modal and keeps balance.
+
+---
+
+## 🧠 Architecture & Approach
+1. **Pre-calculated RNG Architecture**: When a spin starts, `RNGManager` determines the 3 target symbols immediately based on probability weights. The visual reels spin and align the target symbols to the payline (`y = 0`) before playing the bounce animation.
+2. **Evaluator Testing / Debug Hook**: To make testing fast and deterministic:
+   - Select `GameController` in the Hierarchy.
+   - In `RNGManager`, check `Force Win` (boolean) and select any `Forced Symbol`.
+   - Every spin will now guarantee a 3-of-a-kind win with that symbol.
+3. **Folder Organization**:
+   - `Assets/Scripts/Slot/`: `Reel.cs`, `SlotMachineController.cs`, `LeverController.cs`
+   - `Assets/Scripts/Logic/`: `RNGManager.cs`, `BetManager.cs`, `SymbolType.cs`
+   - `Assets/Scripts/ui/`: `BetMenuController.cs`, `WinPopupController.cs`
+   - `Assets/Scripts/Audio/`: `SoundManager.cs`
+   - `Assets/Prefabs/`: `SymbolItem.prefab`
+   - `Assets/Sounds/`: Retro `.wav` audio files
+   - `Assets/Scenes/`: `MainScene.unity`
+   - `Build/WebGL/`: Playable WebGL browser build
+
+---
+
+## 🚀 How to Run
+
+### 1. Running the WebGL Build (Browser)
+The playable browser build is included directly inside the repository under `/Build/WebGL/`:
+
+Using Python:
+```bash
+cd Build/WebGL
+python -m http.server 8000
 ```
-Assets/
-├── Prefabs/
-│   └── SymbolItem.prefab          # Reusable symbol UI prefab
-├── Scenes/
-│   └── MainScene.unity            # Primary game scene
-├── Scripts/
-│   ├── Logic/
-│   │   ├── SymbolType.cs          # Strongly-typed enum for symbols
-│   │   ├── RNGManager.cs          # Weighted probability RNG with evaluator debug hooks
-│   │   └── BetManager.cs          # Player balance, wagers, and payout calculation
-│   ├── Slot/
-│   │   ├── Reel.cs                # Endless scroll, symbol pooling, and bounce easing
-│   │   ├── SlotMachineController.cs # Master coordinator for sequential reel stopping
-│   │   └── LeverController.cs     # Dual-state mechanical lever animation
-│   └── UI/
-│       ├── BetMenuController.cs   # Right-click context menu toggle
-│       └── WinPopupController.cs  # Win celebration dialog and replay flow
-└── UI/                            # Sprites, sliced buttons, and graphics
-```
+Then open `http://localhost:8000` in any web browser.
 
-### 1. Pre-calculated RNG Flow (Casino Industry Standard)
-Unlike naive implementations where random movement determines symbols by physics collision, real casino slot machines determine the outcome via a cryptographically fair/weighted Random Number Generator **upfront** upon spin initiation. The visual reels then accelerate, cycle infinitely using symbol pooling, and decelerate to land exactly on the predetermined outcome with zero visual seams.
+Alternatively, you can use any local static server (e.g. Node `npx serve Build/WebGL` or VS Code Live Server).
 
-### 2. Evaluator Test Hooks (Force Win)
-In `RNGManager.cs`, evaluators can toggle `forceWin = true` and pick any `forcedSymbol` directly in the Unity Inspector to verify jackpot and win calculations deterministically.
-
-### 3. Smooth Mechanical Easing & Bounce
-Each reel features:
-1. **Acceleration Phase**: Smooth ramp-up using `Mathf.Lerp`.
-2. **Infinite Looping Phase**: Vertical wrapping of symbol RectTransforms.
-3. **Deceleration & Snap**: Precision alignment to the center payline (`y = 0`).
-4. **Physical Bounce**: A 2-phase overshoot (`y = -bounceOvershoot`) and spring return (`y = 0`) using `Mathf.SmoothStep` for authentic arcade game feel.
-
----
-
-## 🚀 How to Run the Project
-
-### Running in Unity Editor
-1. Clone the repository:
+### 2. Running in Unity Editor
+1. Clone this repository:
    ```bash
    git clone https://github.com/axel2310/slot_game.git
    ```
-2. Open **Unity Hub** and click **Add** → select the cloned directory.
-3. Recommended Editor: **Unity 2022.3 LTS** or **Unity 6**.
-4. Open `Assets/Scenes/MainScene.unity` and click **Play (`▶`)**.
-
-### Running WebGL Build (Browser Play)
-1. Navigate to `/Build/WebGL/` folder.
-2. Run a local web server (e.g. using Python: `python -m http.server 8000` inside `/Build/WebGL/`).
-3. Open `http://localhost:8000` in any modern web browser.
-
----
-
-## 🌟 Bonus Features Implemented
-- **2-State Mechanical Lever**: Dual sprite layering with socket plunge and recoil animation.
-- **Win Celebration Modal**: Integrated `popup.png` with custom-sliced golden `Yes_No_Btn` sprites.
-- **Consolation Multiplier**: 2-Cherry match returns 2x bet so the player remains engaged.
-- **Full Inspector Debugging**: Runtime test hooks to evaluate payouts and reel behaviors on demand.
+2. Open **Unity Hub** -> **Add** -> Select the project folder.
+3. Recommended Editor: **Unity 6** or **Unity 2022.3 LTS**.
+4. Open `Assets/Scenes/MainScene.unity` and click **Play**.
