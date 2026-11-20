@@ -11,9 +11,7 @@ public class BetMenuController : MonoBehaviour
 
     private void Start()
     {
-        // Shuru me menu ko khula ya band jaisa chaho rakh sakte ho:
-        // Agar GIF ki tarah shuru me band rakhna ho:
-        // if (betMenuPanel != null) betMenuPanel.SetActive(false);
+        
     }
 
     private void Update()
